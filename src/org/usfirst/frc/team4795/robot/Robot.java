@@ -105,10 +105,10 @@ public class Robot extends IterativeRobot {
 		Scheduler.getInstance().run();
 		
 
-		//subscriber.connect("tcp://*:5555");
+		subscriber.bind("tcp://*:5808");
 		
-		//String Angle = subscriber.recvStr();
-		//SmartDashboard.putString("Angle", Angle);
+		String Angle = subscriber.recvStr();
+		SmartDashboard.putString("Angle", Angle);
 	}
 
 	/**
