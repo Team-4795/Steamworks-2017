@@ -8,15 +8,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.nio.charset.Charset;
 
+import org.usfirst.frc.team4795.robot.subsystems.Drivetrain;
 import org.zeromq.*;
 
 public class Robot extends IterativeRobot {
     
-	private ZMQ.Context context;
+    private OI oi;
+    private Drivetrain drivetrain;
+    
+    private ZMQ.Context context;
 	private ZMQ.Socket subscriber;
 	
 	@Override
 	public void robotInit() {
+	    drivetrain = new Drivetrain();
+	    drivetrain.init();
+	    
+	    oi = new OI();
+	    oi.init();
+	    
 	    context = ZMQ.context(1);
 	    subscriber = context.socket(ZMQ.SUB);
 	    subscriber.bind("tcp://*:5808");

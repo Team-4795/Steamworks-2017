@@ -824,17 +824,30 @@ public class BNO055 {
 		return xyz[0] + turns * 360;
 	}
 	
+	/**
+	 * @return the rotation rate vector from the gyroscope in degrees per second
+	 */
 	public double[] getDubya() {
-	    double divisor = (read8(reg_t.BNO055_UNIT_SEL_ADDR) & 2) == 0 ? 16.0 : 900.0;
+	    // determine if angular rate data from the sensor is in degrees or radians per second
+	    boolean dps = (read8(reg_t.BNO055_UNIT_SEL_ADDR) & 2) == 0;
+	    
+	    // both units used a fixed point format so a divisor is needed to convert to floating point
+	    double divisor = dps ? 16.0 : 900.0;
+	    
 	    double[] rotRate = new double[3];
-
 	    rotRate[2] = (read8(reg_t.BNO055_GYRO_DATA_Z_LSB_ADDR)
 	                  | (read8(reg_t.BNO055_GYRO_DATA_Z_MSB_ADDR) << 8)) / divisor;
 	    rotRate[1] = (read8(reg_t.BNO055_GYRO_DATA_Y_LSB_ADDR)
                       | (read8(reg_t.BNO055_GYRO_DATA_Y_MSB_ADDR) << 8)) / divisor;
 	    rotRate[0] = (read8(reg_t.BNO055_GYRO_DATA_X_LSB_ADDR)
                       | (read8(reg_t.BNO055_GYRO_DATA_X_MSB_ADDR) << 8)) / divisor;
-
+	    
+	    if(!dps) {
+	        rotRate[2] *= 180 / Math.PI;
+	        rotRate[1] *= 180 / Math.PI;
+	        rotRate[0] *= 180 / Math.PI;
+	    }
+	    
 	    return rotRate;
 	}
 	

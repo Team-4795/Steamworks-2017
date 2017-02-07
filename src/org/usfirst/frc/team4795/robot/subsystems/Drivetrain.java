@@ -2,7 +2,6 @@ package org.usfirst.frc.team4795.robot.subsystems;
 
 import org.usfirst.frc.team4795.robot.RobotMap;
 
-
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
@@ -14,10 +13,11 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class Drivetrain extends Subsystem implements PIDOutput {
 
-	public static final double WHEEL_DIAMETER_IN = 6.0;
+	public static final double WHEEL_DIAMETER_IN = 4.0;
 	public static final int ENCODER_TICKS_PER_REV = 2048;
-	public static final double ENCODER_TICKS_PER_FT = (ENCODER_TICKS_PER_REV * 48)
-			/ (Math.PI * WHEEL_DIAMETER_IN);
+	public static final double ENCODER_TICKS_PER_FT =
+	        (ENCODER_TICKS_PER_REV * 48) / (Math.PI * WHEEL_DIAMETER_IN);
+	public static final double ENCODER_TICKS_PER_METER = (ENCODER_TICKS_PER_FT * 2.54) / 1200;
 
 	private final CANTalon leftMotor1;
 	private final CANTalon leftMotor2;
@@ -129,41 +129,46 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 
 	@Override
 	public void pidWrite(double output) {
-		// XXX using negatives since this is only called by the rotation
-		// controller
+		// XXX using negatives since this is only called by the rotation controller
 		leftMotor1.pidWrite(-output);
 		leftMotor2.pidWrite(-output);
 		rightMotor1.pidWrite(output);
 		rightMotor2.pidWrite(output);
 	}
 
-	public void setFPID(double F, double P, double I, double D) {
-		leftMotor1.setF(F);
+	public void setPIDF(double P, double I, double D, double F) {
 		leftMotor1.setPID(P, I, D);
-		rightMotor1.setF(F);
+		leftMotor1.setF(F);
 		rightMotor1.setPID(P, I, D);
+		rightMotor1.setF(F);
 	}
 
 	public void drive(double left, double right) {
 		changeControlMode(TalonControlMode.PercentVbus);
 		setRaw(left, right);
 	}
-
-	public void drive(double distance, double F, double P, double I, double D) {
+	
+	public void driveFeet(double distance, double P, double I, double D, double F) {
 		changeControlMode(TalonControlMode.Position);
-		setFPID(F, P, I, D);
+		setPIDF(P, I, D, F);
 		double distanceTicks = distance * ENCODER_TICKS_PER_FT;
 		setRaw(leftMotor1.getPosition() + distanceTicks,
 				rightMotor1.getPosition() + distanceTicks);
 	}
-
-	public void rotateRadians(double angle, double F, double P, double I,
-			double D) {
+	
+	public void driveMeters(double distance, double P, double I, double D, double F) {
+        changeControlMode(TalonControlMode.Position);
+        setPIDF(P, I, D, F);
+        double distanceTicks = distance * ENCODER_TICKS_PER_METER;
+        setRaw(leftMotor1.getPosition() + distanceTicks,
+                rightMotor1.getPosition() + distanceTicks);
+    }
+	
+	public void rotateRadians(double angle, double P, double I, double D, double F) {
 		rotateDegrees(Math.toDegrees(angle), F, P, I, D);
 	}
 
-	public void rotateDegrees(double angle, double F, double P, double I,
-			double D) {
+	public void rotateDegrees(double angle, double P, double I, double D, double F) {
 		changeControlMode(TalonControlMode.PercentVbus);
 		gyroControl.setPID(P, I, D, F);
 		gyroControl.setSetpoint(gyroscope.getAngle() + angle);
@@ -188,6 +193,10 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 
 	public double getLeftCurrent() {
 		return leftMotor1.getOutputCurrent();
+	}
+	
+	public double getRightCurrent() {
+	    return rightMotor1.getOutputCurrent();
 	}
 
 	public double getLeftError() {
@@ -227,9 +236,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	}
 
 	@Override
-	protected void initDefaultCommand() 
-	{
-	}
+	protected void initDefaultCommand() {}
 
 }
 
