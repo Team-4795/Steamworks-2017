@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4795.robot.subsystems;
 
 import org.usfirst.frc.team4795.commands.IdleBrake;
+import org.usfirst.frc.team4795.commands.TankDrive;
 import org.usfirst.frc.team4795.robot.Robot;
 import org.usfirst.frc.team4795.robot.RobotMap;
 
@@ -226,7 +227,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 
 	@Override
 	protected void initDefaultCommand() {
-	    setDefaultCommand(new IdleBrake());
+	    setDefaultCommand(new TankDrive());
 	}
 
 }
