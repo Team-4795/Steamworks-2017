@@ -256,46 +256,125 @@ public class BNO055 {
 	};
 
 	public enum powermode_t	{
-		POWER_MODE_NORMAL                                       (0X00),
-		POWER_MODE_LOWPOWER                                     (0X01),
-		POWER_MODE_SUSPEND                                      (0X02);
+		POWER_MODE_NORMAL                                       (0X00, "NORMAL"),
+		POWER_MODE_LOWPOWER                                     (0X01, "LOWPOWER"),
+		POWER_MODE_SUSPEND                                      (0X02, "SUSPEND");
 
 		private final int val;
+		private final String name;
 
-		powermode_t(int val) {
+		powermode_t(int val, String name) {
 			this.val = val;
+			this.name = name;
 		}
 
 		public int getVal() {
 			return val;
+		}
+		
+		public String getName() {
+		    return name;
+		}
+		
+		public static powermode_t fromVal(int val) {
+		    for(powermode_t powermode : powermode_t.values()) {
+		        if(powermode.val == val) {return powermode;}
+		    }
+		    return POWER_MODE_NORMAL;
+		}
+		
+		public static powermode_t fromName(String name) {
+		    for(powermode_t powermode : powermode_t.values()) {
+		        if(powermode.name.equals(name)) {return powermode;}
+		    }
+		    return POWER_MODE_NORMAL;
 		}
 	};
 
 	public enum opmode_t {
 		/* Operation mode settings*/
-		OPERATION_MODE_CONFIG                                   (0X00),
-		OPERATION_MODE_ACCONLY                                  (0X01),
-		OPERATION_MODE_MAGONLY                                  (0X02),
-		OPERATION_MODE_GYRONLY                                  (0X03),
-		OPERATION_MODE_ACCMAG                                   (0X04),
-		OPERATION_MODE_ACCGYRO                                  (0X05),
-		OPERATION_MODE_MAGGYRO                                  (0X06),
-		OPERATION_MODE_AMG                                      (0X07),
-		OPERATION_MODE_IMUPLUS                                  (0X08),
-		OPERATION_MODE_COMPASS                                  (0X09),
-		OPERATION_MODE_M4G                                      (0X0A),
-		OPERATION_MODE_NDOF_FMC_OFF                             (0X0B),
-		OPERATION_MODE_NDOF                                     (0X0C);
+		OPERATION_MODE_CONFIG                                   (0X00, "Config"),
+		OPERATION_MODE_ACCONLY                                  (0X01, "Acc Only"),
+		OPERATION_MODE_MAGONLY                                  (0X02, "Mag Only"),
+		OPERATION_MODE_GYRONLY                                  (0X03, "Gyr Only"),
+		OPERATION_MODE_ACCMAG                                   (0X04, "Acc Mag"),
+		OPERATION_MODE_ACCGYRO                                  (0X05, "Acc Gyr"),
+		OPERATION_MODE_MAGGYRO                                  (0X06, "Mag Gyr"),
+		OPERATION_MODE_AMG                                      (0X07, "Acc Mag Gyr"),
+		OPERATION_MODE_IMUPLUS                                  (0X08, "IMU Plus"),
+		OPERATION_MODE_COMPASS                                  (0X09, "Compass"),
+		OPERATION_MODE_M4G                                      (0X0A, "Mag 4 Gyr"),
+		OPERATION_MODE_NDOF_FMC_OFF                             (0X0B, "NDOF (FMC Off)"),
+		OPERATION_MODE_NDOF                                     (0X0C, "NDOF");
 
 		private final int val;
+		private final String name;
 
-		opmode_t(int val) {
+		opmode_t(int val, String name) {
 			this.val = val;
+			this.name = name;
 		}
 
 		public int getVal() {
 			return val;
 		}
+		
+		public String getName() {
+		    return name;
+		}
+		
+		public static opmode_t fromVal(int val) {
+		    for(opmode_t opmode : opmode_t.values()) {
+		        if(opmode.val == val) {return opmode;}
+		    }
+		    return OPERATION_MODE_CONFIG;
+		}
+		
+		public static opmode_t fromName(String name) {
+		    for(opmode_t opmode : opmode_t.values()) {
+		        if(opmode.name.equals(name)) {return opmode;}
+		    }
+		    return OPERATION_MODE_CONFIG;
+		}
+	}
+	
+	public enum sys_status_t {
+	    SYSTEM_STATUS_IDLE     (0x00, "System idle"),
+	    SYSTEM_STATUS_ERROR    (0x01, "System error"),
+	    SYSTEM_STATUS_INIT     (0x02, "Initializing peripherals"),
+	    SYSTEM_STATUS_SELFTEST (0x03, "Running self test"),
+	    SYSTEM_STATUS_FUSION   (0x04, "Running w/ fusion"),
+	    SYSTEM_STATUS_NOFUSION (0x05, "Running w/o fusion");
+	    
+	    private final int val;
+	    private final String name;
+	    
+	    sys_status_t(int val, String name) {
+	        this.val = val;
+	        this.name = name;
+	    }
+	    
+	    public int getVal() {
+	        return val;
+	    }
+	    
+	    public String getName() {
+	        return name;
+	    }
+	    
+	    public static sys_status_t fromVal(int val) {
+            for(sys_status_t sys_status : sys_status_t.values()) {
+                if(sys_status.val == val) {return sys_status;}
+            }
+            return SYSTEM_STATUS_IDLE;
+        }
+        
+        public static sys_status_t fromName(String name) {
+            for(sys_status_t sys_status : sys_status_t.values()) {
+                if(sys_status.name.equals(name)) {return sys_status;}
+            }
+            return SYSTEM_STATUS_IDLE;
+        }
 	}
 
 	public class RevInfo {
@@ -566,6 +645,10 @@ public class BNO055 {
 	private void setMode(int mode) {
 		_mode = mode;
 		write8(reg_t.BNO055_OPR_MODE_ADDR, (byte) _mode);
+	}
+	
+	public opmode_t getMode() {
+	    return opmode_t.fromVal(_mode);
 	}
 
 	/**

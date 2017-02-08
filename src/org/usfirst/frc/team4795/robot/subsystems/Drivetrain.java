@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4795.robot.subsystems;
 
+import org.usfirst.frc.team4795.commands.IdleBrake;
+import org.usfirst.frc.team4795.robot.Robot;
 import org.usfirst.frc.team4795.robot.RobotMap;
 
 import com.ctre.CANTalon;
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class Drivetrain extends Subsystem implements PIDOutput {
 
@@ -17,7 +20,6 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	public static final int ENCODER_TICKS_PER_REV = 2048;
 	public static final double ENCODER_TICKS_PER_FT =
 	        (ENCODER_TICKS_PER_REV * 48) / (Math.PI * WHEEL_DIAMETER_IN);
-	public static final double ENCODER_TICKS_PER_METER = (ENCODER_TICKS_PER_FT * 2.54) / 1200;
 
 	private final CANTalon leftMotor1;
 	private final CANTalon leftMotor2;
@@ -29,7 +31,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 
 	private boolean closedLoopMode = false;
 	private boolean gyroControlMode = false;
-
+	
 	private boolean brakeMode = false;
 
 	public Drivetrain() {
@@ -45,33 +47,18 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		leftMotor2 = new CANTalon(RobotMap.LEFT_MOTOR_2.value);
 		rightMotor1 = new CANTalon(RobotMap.RIGHT_MOTOR_1.value);
 		rightMotor2 = new CANTalon(RobotMap.RIGHT_MOTOR_2.value);
-
-		disableControl();
-
-		leftMotor1.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
-		rightMotor1.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
-
+		
+		Robot.initTalon(leftMotor1, ENCODER_TICKS_PER_REV);
+		Robot.initTalon(leftMotor2, ENCODER_TICKS_PER_REV);
 		leftMotor1.reverseSensor(true);
-		rightMotor1.reverseSensor(false);
-
-		leftMotor1.ConfigFwdLimitSwitchNormallyOpen(true);
-		leftMotor1.ConfigRevLimitSwitchNormallyOpen(true);
-		leftMotor2.ConfigFwdLimitSwitchNormallyOpen(true);
-		leftMotor2.ConfigRevLimitSwitchNormallyOpen(true);
-		rightMotor1.ConfigFwdLimitSwitchNormallyOpen(true);
-		rightMotor1.ConfigRevLimitSwitchNormallyOpen(true);
-		rightMotor2.ConfigFwdLimitSwitchNormallyOpen(true);
-		rightMotor2.ConfigRevLimitSwitchNormallyOpen(true);
-
-		leftMotor1.configMaxOutputVoltage(12);
-		leftMotor2.configMaxOutputVoltage(12);
-		rightMotor1.configMaxOutputVoltage(12);
-		rightMotor2.configMaxOutputVoltage(12);
-
-		leftMotor1.enableBrakeMode(false);
-		leftMotor2.enableBrakeMode(false);
-		rightMotor1.enableBrakeMode(false);
-		rightMotor2.enableBrakeMode(false);
+		leftMotor2.reverseSensor(true);
+		Robot.initTalon(rightMotor1, ENCODER_TICKS_PER_REV);
+		Robot.initTalon(rightMotor2, ENCODER_TICKS_PER_REV);
+		
+		LiveWindow.addSensor("Drivetrain", "Left Motor 1", leftMotor1);
+		LiveWindow.addSensor("Drivetrain", "Left Motor 2", leftMotor2);
+		LiveWindow.addSensor("Drivetrain", "Right Motor 1", rightMotor1);
+		LiveWindow.addSensor("Drivetrain", "Right Motor 2", rightMotor2);
 	}
 
 	public void init() {
@@ -80,6 +67,8 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		gyroControl.setOutputRange(-1.0, 1.0);
 		gyroControl.setInputRange(0.0, 360.0);
 		gyroControl.setContinuous(true);
+		
+		LiveWindow.addSensor("Drivetrain", "Gyroscope", gyroControl);
 	}
 
 	public void disableControl() {
@@ -143,7 +132,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		rightMotor1.setF(F);
 	}
 
-	public void drive(double left, double right) {
+	public void driveBasic(double left, double right) {
 		changeControlMode(TalonControlMode.PercentVbus);
 		setRaw(left, right);
 	}
@@ -157,11 +146,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	}
 	
 	public void driveMeters(double distance, double P, double I, double D, double F) {
-        changeControlMode(TalonControlMode.Position);
-        setPIDF(P, I, D, F);
-        double distanceTicks = distance * ENCODER_TICKS_PER_METER;
-        setRaw(leftMotor1.getPosition() + distanceTicks,
-                rightMotor1.getPosition() + distanceTicks);
+        driveFeet(distance / Robot.METERS_PER_FT, P, I, D, F);
     }
 	
 	public void rotateRadians(double angle, double P, double I, double D, double F) {
@@ -176,12 +161,16 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		gyroControlMode = true;
 	}
 
-	public void toggleBrakeMode() {
-		brakeMode = !brakeMode;
-		leftMotor1.enableBrakeMode(brakeMode);
-		leftMotor2.enableBrakeMode(brakeMode);
-		rightMotor1.enableBrakeMode(brakeMode);
-		rightMotor2.enableBrakeMode(brakeMode);
+	public void setBrakeMode(boolean value) {
+	    brakeMode = value;
+		leftMotor1.enableBrakeMode(value);
+		leftMotor2.enableBrakeMode(value);
+		rightMotor1.enableBrakeMode(value);
+		rightMotor2.enableBrakeMode(value);
+	}
+	
+	public boolean getBrakeMode() {
+	    return brakeMode;
 	}
 
 	public void setRampRate(double rampRate) {
@@ -236,7 +225,9 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	}
 
 	@Override
-	protected void initDefaultCommand() {}
+	protected void initDefaultCommand() {
+	    setDefaultCommand(new IdleBrake());
+	}
 
 }
 

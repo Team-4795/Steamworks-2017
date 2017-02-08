@@ -1,12 +1,17 @@
 package org.usfirst.frc.team4795.robot.subsystems;
 
 import org.usfirst.frc.team4795.robot.BNO055;
+import org.usfirst.frc.team4795.robot.BNO055.CalStatus;
+import org.usfirst.frc.team4795.robot.BNO055.SystemStatus;
+import org.usfirst.frc.team4795.robot.BNO055.sys_status_t;
 
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.tables.ITable;
 
-public class IMU extends Subsystem implements PIDSource {
+public class IMU implements PIDSource, LiveWindowSendable {
     
     private static IMU instance = null; 
 	private static BNO055 imu;
@@ -14,18 +19,17 @@ public class IMU extends Subsystem implements PIDSource {
     private IMU() {	
     	imu = BNO055.getInstance(BNO055.opmode_t.OPERATION_MODE_NDOF,
     	        BNO055.vector_type_t.VECTOR_EULER);
+    	
     }
     
 	public static IMU getInstance() {
 		if(instance == null) {
 			instance = new IMU();
+			LiveWindow.addSensor("IMU", "IMU", instance);
 		}
 		
 		return instance;
 	}
-	
-	@Override
-    public void initDefaultCommand() {}
    
     /**
 	 * The heading of the sensor (x axis) in continuous format. Eg rotating the
@@ -105,4 +109,52 @@ public class IMU extends Subsystem implements PIDSource {
 	public double pidGet() {
 		return imu.getDubya()[2];
 	}
+	
+	private ITable table;
+	
+	@Override
+    public void initTable(ITable subtable) {
+        table = subtable;
+    }
+
+    @Override
+    public ITable getTable() {
+        return table;
+    }
+
+    @Override
+    public String getSmartDashboardType() {
+        return "IMU";
+    }
+
+    @Override
+    public void updateTable() {
+        if(table != null && imu.isSensorPresent()) {
+            table.putString("Mode", imu.getMode().getName());
+            
+            SystemStatus status = imu.getSystemStatus();
+            table.putString("Status", sys_status_t.fromVal(status.system_status).getName());
+            table.putString("Self Test", status.self_test_result == 0x0F ? "Pass" : "Fail");
+            
+            CalStatus cal = imu.getCalibrationStatus();
+            table.putNumber("Sys Cal", cal.sys);
+            table.putNumber("Gyr Cal", cal.gyro);
+            table.putNumber("Acc Cal", cal.accel);
+            table.putNumber("Mag Cal", cal.mag);
+            
+            table.putBoolean("Cal Done", imu.isCalibrated());
+            
+            double[] xyz = imu.getVector();
+            table.putNumber("Heading", xyz[0]);
+            table.putNumber("Roll", xyz[1]);
+            table.putNumber("Pitch", xyz[2]);
+        }
+    }
+
+    @Override
+    public void startLiveWindowMode() {}
+
+    @Override
+    public void stopLiveWindowMode() {}
+    
 }
