@@ -29,8 +29,8 @@ public class Robot extends IterativeRobot {
 	    
 	    context = ZMQ.context(1);
 	    subscriber = context.socket(ZMQ.SUB);
-	    subscriber.bind("tcp://*:5808");
-	    subscriber.subscribe("B".getBytes());
+	    subscriber.subscribe("".getBytes());
+	    subscriber.connect("tcp://raspberrypi.local:5808");
 	    subscriber.setReceiveTimeOut(10);
 	}
 	
@@ -41,11 +41,8 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
         
-        // read and discard the topic
-        subscriber.recvStr(Charset.defaultCharset());
-        
         String angle = subscriber.recvStr(Charset.defaultCharset());
-        if(!angle.equals("")) {
+        if(angle != null && !angle.equals("")) {
             SmartDashboard.putString("Angle", angle);
         }
     }
