@@ -5,6 +5,7 @@ import org.usfirst.frc.team4795.robot.Robot;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class TurnToTarget extends Command {
+    
 	private final double angle;
 
 	public TurnToTarget(double angle) {
@@ -12,7 +13,7 @@ public class TurnToTarget extends Command {
 	}
 
 	protected void initialize() {
-		Robot.drivetrain.rotateDegrees(angle, 10, 10, 10,0);
+		Robot.drivetrain.rotateDegrees(angle);
 	}
 
 	protected void execute() {

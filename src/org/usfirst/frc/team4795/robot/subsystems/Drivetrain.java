@@ -1,6 +1,5 @@
 package org.usfirst.frc.team4795.robot.subsystems;
 
-import org.usfirst.frc.team4795.commands.IdleBrake;
 import org.usfirst.frc.team4795.commands.TankDrive;
 import org.usfirst.frc.team4795.robot.Robot;
 import org.usfirst.frc.team4795.robot.RobotMap;
@@ -16,6 +15,14 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class Drivetrain extends Subsystem implements PIDOutput {
+    
+    public static final double P_POS = 0.0;
+    public static final double I_POS = 0.0;
+    public static final double D_POS = 0.0;
+    
+    public static final double P_GYRO_POS = 0.0;
+    public static final double I_GYRO_POS = 0.0;
+    public static final double D_GYRO_POS = 0.0;
 
 	public static final double WHEEL_DIAMETER_IN = 4.0;
 	public static final int ENCODER_TICKS_PER_REV = 2048;
@@ -138,25 +145,25 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		setRaw(left, right);
 	}
 	
-	public void driveFeet(double distance, double P, double I, double D, double F) {
+	public void driveFeet(double distance) {
 		changeControlMode(TalonControlMode.Position);
-		setPIDF(P, I, D, F);
+		setPIDF(P_POS, I_POS, D_POS, 0.0);
 		double distanceTicks = distance * ENCODER_TICKS_PER_FT;
 		setRaw(leftMotor1.getPosition() + distanceTicks,
 				rightMotor1.getPosition() + distanceTicks);
 	}
 	
-	public void driveMeters(double distance, double P, double I, double D, double F) {
-        driveFeet(distance / Robot.METERS_PER_FT, P, I, D, F);
+	public void driveMeters(double distance) {
+        driveFeet(distance / Robot.METERS_PER_FT);
     }
 	
-	public void rotateRadians(double angle, double P, double I, double D, double F) {
-		rotateDegrees(Math.toDegrees(angle), F, P, I, D);
+	public void rotateRadians(double angle) {
+		rotateDegrees(Math.toDegrees(angle));
 	}
 
-	public void rotateDegrees(double angle, double P, double I, double D, double F) {
+	public void rotateDegrees(double angle) {
 		changeControlMode(TalonControlMode.PercentVbus);
-		gyroControl.setPID(P, I, D, F);
+		gyroControl.setPID(P_GYRO_POS, I_GYRO_POS, D_GYRO_POS, 0.0);
 		gyroControl.setSetpoint(gyroscope.getAngle() + angle);
 		gyroControl.enable();
 		gyroControlMode = true;
