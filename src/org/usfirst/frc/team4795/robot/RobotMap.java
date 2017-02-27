@@ -6,6 +6,7 @@ public enum RobotMap
     // Motor mappings
     // PWM motor controllers
     INTAKE_MOTOR(0),
+    AGITATOR_MOTOR(1),
     // CAN motor controllers
     LEFT_MOTOR_1(1),
     LEFT_MOTOR_2(2),

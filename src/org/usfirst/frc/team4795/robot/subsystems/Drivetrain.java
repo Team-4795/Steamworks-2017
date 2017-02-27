@@ -7,7 +7,6 @@ import org.usfirst.frc.team4795.robot.RobotMap;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSourceType;
@@ -20,9 +19,9 @@ public class Drivetrain extends Subsystem implements PIDOutput {
     public static final double I_POS = 0.0;
     public static final double D_POS = 0.0;
     
-    public static final double P_GYRO_POS = 0.0;
+    public static final double P_GYRO_POS = -0.047;
     public static final double I_GYRO_POS = 0.0;
-    public static final double D_GYRO_POS = 0.0;
+    public static final double D_GYRO_POS = -0.56;
 
 	public static final double WHEEL_DIAMETER_IN = 4.0;
 	public static final int ENCODER_TICKS_PER_REV = 2048;
@@ -34,8 +33,8 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	private final CANTalon rightMotor1;
 	private final CANTalon rightMotor2;
 
-	public final ADXRS450_Gyro gyroscope;
-	private PIDController gyroControl;
+//	public final ADXRS450_Gyro gyroscope;
+	public PIDController gyroControl;
 
 	private boolean closedLoopMode = false;
 	private boolean gyroControlMode = false;
@@ -43,13 +42,13 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	private boolean brakeMode = false;
 
 	public Drivetrain() {
-		gyroscope = new ADXRS450_Gyro() {
-			@Override
-			public double getAngle() {
-				return super.getAngle() % 360.0;
-			}
-		};
-		gyroscope.setPIDSourceType(PIDSourceType.kDisplacement);
+//		gyroscope = new ADXRS450_Gyro() {
+//			@Override
+//			public double getAngle() {
+//				return super.getAngle() % 360.0;
+//			}
+//		};
+//		gyroscope.setPIDSourceType(PIDSourceType.kDisplacement);
 
 		leftMotor1 = new CANTalon(RobotMap.LEFT_MOTOR_1.value);
 		leftMotor2 = new CANTalon(RobotMap.LEFT_MOTOR_2.value);
@@ -70,13 +69,17 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	}
 
 	public void init() {
-		gyroControl = new PIDController(0.0, 0.0, 0.0, 0.0, gyroscope, this);
+	    IMU.getInstance().setPIDSourceType(PIDSourceType.kDisplacement);
+	    
+//	    gyroControl = new PIDController(0.0, 0.0, 0.0, 0.0, gyroscope, this);
+		gyroControl = new PIDController(0.0, 0.0, 0.0, 0.0, IMU.getInstance(), this);
 		gyroControl.setPercentTolerance(1);
 		gyroControl.setOutputRange(-1.0, 1.0);
 		gyroControl.setInputRange(0.0, 360.0);
 		gyroControl.setContinuous(true);
 		
-		LiveWindow.addSensor("Drivetrain", "Gyroscope", gyroControl);
+//		LiveWindow.addSensor("Drivetrain", "Gyroscope", gyroControl);
+	    LiveWindow.addSensor("Drivetrain", "IMU", IMU.getInstance());
 	}
 
 	public void disableControl() {
@@ -164,7 +167,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	public void rotateDegrees(double angle) {
 		changeControlMode(TalonControlMode.PercentVbus);
 		gyroControl.setPID(P_GYRO_POS, I_GYRO_POS, D_GYRO_POS, 0.0);
-		gyroControl.setSetpoint(gyroscope.getAngle() + angle);
+		gyroControl.setSetpoint(IMU.getInstance().pidGet() + angle);
 		gyroControl.enable();
 		gyroControlMode = true;
 	}
@@ -228,9 +231,9 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		return rightMotor1.getSpeed();
 	}
 
-	public void calibrateGyroscope() {
-		gyroscope.calibrate();
-	}
+//	public void calibrateGyroscope() {
+//		gyroscope.calibrate();
+//	}
 
 	@Override
 	protected void initDefaultCommand() {

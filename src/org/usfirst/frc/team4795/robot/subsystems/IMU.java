@@ -104,10 +104,10 @@ public class IMU implements PIDSource, LiveWindowSendable {
 
 	@Override
 	/**
-	 * Return rotation rate in Z in units selected on IMU
+	 * Return rotation in Z in units selected on IMU
 	 */
 	public double pidGet() {
-		return imu.getDubya()[2];
+		return sourceType == PIDSourceType.kRate ? imu.getDubya()[2] : imu.getVector()[0];
 	}
 	
 	private ITable table;

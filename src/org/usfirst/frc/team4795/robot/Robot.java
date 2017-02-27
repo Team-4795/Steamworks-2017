@@ -1,21 +1,20 @@
 
 package org.usfirst.frc.team4795.robot;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.nio.charset.Charset;
 
-import org.usfirst.frc.team4795.commands.TankDrive;
 import org.usfirst.frc.team4795.robot.subsystems.Climber;
 import org.usfirst.frc.team4795.robot.subsystems.Drivetrain;
 import org.usfirst.frc.team4795.robot.subsystems.Intake;
 import org.usfirst.frc.team4795.robot.subsystems.Shooter;
-import org.zeromq.*;
+import org.zeromq.ZMQ;
 
 import com.ctre.CANTalon;
+
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
     
@@ -30,13 +29,14 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
-	    oi = new OI();
-        oi.init();
 	    drivetrain = new Drivetrain();
 	    drivetrain.init();
 	    intake = new Intake();
 	    shooter = new Shooter();
 	    climber = new Climber();
+	    
+	    oi = new OI();
+        oi.init();
 	    
 	    context = ZMQ.context(1);
 	    subscriber = context.socket(ZMQ.SUB);

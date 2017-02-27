@@ -1,6 +1,10 @@
 package org.usfirst.frc.team4795.robot;
 
+import org.usfirst.frc.team4795.commands.CalibrateDrivetrain;
+import org.usfirst.frc.team4795.commands.CalibrateShooter;
 import org.usfirst.frc.team4795.commands.SpinIntake;
+import org.usfirst.frc.team4795.commands.SpinShooter;
+import org.usfirst.frc.team4795.commands.TankDrive;
 import org.usfirst.frc.team4795.commands.ToggleBrake;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -15,7 +19,7 @@ public class OI {
     
     public static final double JOY_DEADZONE = 0.05;
     public static final double LEVER_DEADZONE = 0.05;
-    public static final double INTAKE_PWR = 0.4;
+    public static final double INTAKE_PWR = 1.0;
     
     public final Joystick LEFT_JOY = new Joystick(RobotMap.LEFT_JOY.value);
     public final Joystick RIGHT_JOY = new Joystick(RobotMap.RIGHT_JOY.value);
@@ -25,16 +29,19 @@ public class OI {
             new JoystickButton(RIGHT_JOY, RobotMap.R_OVERRIDE.value);
     
     public OI() {
-        Command cmdIntakeIn = new SpinIntake(INTAKE_PWR);
-        Command cmdIntakeOut = new SpinIntake(-INTAKE_PWR);
+        //Command cmdIntakeIn = new SpinIntake(INTAKE_PWR);
+        //Command cmdIntakeOut = new SpinIntake(-INTAKE_PWR);
         Command cmdToggleBrake = new ToggleBrake();
+        Command cmdCalibrateShooter = new CalibrateShooter();
         
+        /*
         new SharedButton(new JoystickButton(MANIPULATOR, RobotMap.M_INTAKE_IN.value),
                 new JoystickButton(LEFT_JOY, RobotMap.L_INTAKE_IN.value),
                 OVERRIDE).whileActive(cmdIntakeIn);
         new SharedButton(new JoystickButton(MANIPULATOR, RobotMap.M_INTAKE_OUT.value),
                 new JoystickButton(LEFT_JOY, RobotMap.L_INTAKE_OUT.value),
                 OVERRIDE).whileActive(cmdIntakeOut);
+        */
         
         // we want to be able to brake while a button is held,
         // but also run other commands in the meantime,
@@ -42,6 +49,14 @@ public class OI {
         JoystickButton butToggleBrake = new JoystickButton(LEFT_JOY, RobotMap.L_TOGGLE_BRAKE.value);
         butToggleBrake.whenPressed(cmdToggleBrake);
         butToggleBrake.whenReleased(cmdToggleBrake);
+        
+        JoystickButton butSwitchMode = new JoystickButton(RIGHT_JOY, 1);
+        butSwitchMode.whileHeld(cmdCalibrateShooter);
+        
+        Command cmdIntakeIn = new SpinIntake(INTAKE_PWR);
+        Command cmdIntakeOut = new SpinIntake(-INTAKE_PWR);
+        new JoystickButton(LEFT_JOY, RobotMap.L_INTAKE_IN.value).whileHeld(cmdIntakeIn);
+        new JoystickButton(LEFT_JOY, RobotMap.L_INTAKE_OUT.value).whileHeld(cmdIntakeOut);
     }
     
     public void init() {}
