@@ -14,7 +14,6 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
     
@@ -26,6 +25,17 @@ public class Robot extends IterativeRobot {
     
     private static ZMQ.Context context;
 	private static ZMQ.Socket subscriber;
+	
+	public static double angle = 0.0;
+	
+	protected void zmqUpdate() {
+	    String angle = subscriber.recvStr(Charset.defaultCharset());
+	    if(angle != null && !angle.equals("")) {
+	        try {
+	            this.angle = Double.parseDouble(angle);
+	        } catch(Exception e) {}
+	    }
+	}
 	
 	@Override
 	public void robotInit() {
@@ -52,10 +62,7 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
         
-        String angle = subscriber.recvStr(Charset.defaultCharset());
-        if(angle != null && !angle.equals("")) {
-            SmartDashboard.putString("Angle", angle);
-        }
+        zmqUpdate();
     }
     
 	@Override
