@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4795.commands;
 
 import org.usfirst.frc.team4795.robot.Robot;
+import org.usfirst.frc.team4795.robot.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -13,7 +14,7 @@ public class DriveDistance extends Command {
     }
 
     protected void initialize() {
-        Robot.drivetrain.driveMeters(Robot.drivetrain.getLeftEncoderPos() + distance);
+        Robot.drivetrain.driveFeet(distance);
     }
 
     protected void execute() {

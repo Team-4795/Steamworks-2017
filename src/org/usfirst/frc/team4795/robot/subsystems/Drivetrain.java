@@ -58,7 +58,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		
 		Robot.initTalon(leftMotor1, ENCODER_TICKS_PER_REV);
 		Robot.initTalon(leftMotor2, ENCODER_TICKS_PER_REV);
-		leftMotor1.reverseSensor(true);
+		leftMotor1.reverseSensor(false);
 		leftMotor2.reverseSensor(true);
 		Robot.initTalon(rightMotor1, ENCODER_TICKS_PER_REV);
 		Robot.initTalon(rightMotor2, ENCODER_TICKS_PER_REV);

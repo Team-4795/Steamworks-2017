@@ -8,10 +8,10 @@ public enum RobotMap
     INTAKE_MOTOR(0),
     AGITATOR_MOTOR(1),
     // CAN motor controllers
-    LEFT_MOTOR_1(1),
-    LEFT_MOTOR_2(2),
-    RIGHT_MOTOR_1(3),
-    RIGHT_MOTOR_2(4),
+    LEFT_MOTOR_1(3),
+    LEFT_MOTOR_2(4),
+    RIGHT_MOTOR_1(1),
+    RIGHT_MOTOR_2(2),
     SHOOTER_MOTOR(5),
     CLIMBER_MOTOR(6),
     // Joystick mappings

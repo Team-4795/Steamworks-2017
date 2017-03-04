@@ -1,19 +1,23 @@
 package org.usfirst.frc.team4795.commands;
 
+import org.usfirst.frc.team4795.robot.BNO055.CalStatus;
 import org.usfirst.frc.team4795.robot.Robot;
+import org.usfirst.frc.team4795.robot.subsystems.IMU;
+
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class CalibrateDrivetrain extends Command {
+public class CalibrateGyro extends Command {
     
-    public CalibrateDrivetrain() {
+    public CalibrateGyro() {
         requires(Robot.drivetrain);
     }
     
     protected void initialize() {
-        Robot.drivetrain.changeControlMode(TalonControlMode.Position);
+        Robot.drivetrain.changeControlMode(TalonControlMode.PercentVbus);
+        Robot.drivetrain.gyroControl.enable();
         
         if(!SmartDashboard.containsKey("P")) {
             SmartDashboard.putNumber("P", 0.0);
@@ -24,8 +28,8 @@ public class CalibrateDrivetrain extends Command {
         if(!SmartDashboard.containsKey("D")) {
             SmartDashboard.putNumber("D", 0.0);
         }
-        if(!SmartDashboard.containsKey("Setpoint")) {
-            SmartDashboard.putNumber("Setpoint", 0.0);
+        if(!SmartDashboard.containsKey("Setpoint (Degrees)")) {
+            SmartDashboard.putNumber("Setpoint (Degrees)", 0.0);
         }
         if(!SmartDashboard.containsKey("Ramp Rate")) {
             SmartDashboard.putNumber("Ramp Rate", 12.0);
@@ -36,23 +40,25 @@ public class CalibrateDrivetrain extends Command {
         double P = SmartDashboard.getNumber("P", 0.0);
         double I = SmartDashboard.getNumber("I", 0.0);
         double D = SmartDashboard.getNumber("D", 0.0);
-        Robot.drivetrain.setPIDF(P, I, D, 0.0);
+        Robot.drivetrain.gyroControl.setPID(P, I, D);
         
         double rampRate = SmartDashboard.getNumber("Ramp Rate", 12.0);
         Robot.drivetrain.setRampRate(rampRate);
         
-        double setpoint = SmartDashboard.getNumber("Setpoint", 0.0);
-        Robot.drivetrain.setRaw(setpoint, setpoint);
+        double setpoint = SmartDashboard.getNumber("Setpoint (Degrees)", 0.0);
+        Robot.drivetrain.gyroControl.setSetpoint(setpoint);
         
-        double lposition = Robot.drivetrain.getLeftEncoderPos();
-        double rposition = Robot.drivetrain.getRightEncoderPos();
-        SmartDashboard.putNumber("Left Pos", lposition);
-        SmartDashboard.putNumber("Right Pos", rposition);
+        double position = IMU.getInstance().pidGet();
+        SmartDashboard.putNumber("Position (Degrees)", position);
         
-        double lerror = Robot.drivetrain.getLeftError();
-        double rerror = Robot.drivetrain.getRightError();
-        SmartDashboard.putNumber("Left Error", lerror);
-        SmartDashboard.putNumber("Right Error", rerror);
+        double error = Robot.drivetrain.gyroControl.getError();
+        SmartDashboard.putNumber("Error (Degrees)", error);
+        
+        CalStatus calStatus = IMU.getInstance().getCalibrationStatus();
+        SmartDashboard.putNumber("Sys Cal", calStatus.sys);
+        SmartDashboard.putNumber("Gyr Cal", calStatus.gyro);
+        SmartDashboard.putNumber("Acc Cal", calStatus.accel);
+        SmartDashboard.putNumber("Mag Cal", calStatus.mag);
     }
     
     @Override
@@ -61,7 +67,7 @@ public class CalibrateDrivetrain extends Command {
     }
 
     protected void end() {
-        Robot.drivetrain.driveBasic(0.0, 0.0);
+        Robot.drivetrain.gyroControl.reset();
     }
 
     protected void interrupted() {

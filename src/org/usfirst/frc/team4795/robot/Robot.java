@@ -3,6 +3,7 @@ package org.usfirst.frc.team4795.robot;
 
 import java.nio.charset.Charset;
 
+import org.usfirst.frc.team4795.commands.CalibrateDrivetrain;
 import org.usfirst.frc.team4795.robot.subsystems.Agitator;
 import org.usfirst.frc.team4795.robot.subsystems.Climber;
 import org.usfirst.frc.team4795.robot.subsystems.Drivetrain;
@@ -74,7 +75,9 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-    public void teleopInit() {}
+    public void teleopInit() {
+	    Scheduler.getInstance().add(new CalibrateDrivetrain());
+	}
 	
 	@Override
     public void teleopPeriodic() {

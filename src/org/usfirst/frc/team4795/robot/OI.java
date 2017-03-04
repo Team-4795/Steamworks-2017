@@ -1,7 +1,5 @@
 package org.usfirst.frc.team4795.robot;
 
-import org.usfirst.frc.team4795.commands.AutoShooter;
-import org.usfirst.frc.team4795.commands.CalibrateShooter;
 import org.usfirst.frc.team4795.commands.Climb;
 import org.usfirst.frc.team4795.commands.ReverseControls;
 import org.usfirst.frc.team4795.commands.SpinAgitator;
@@ -39,7 +37,7 @@ public class OI {
         //Command cmdAutoShooter = new AutoShooter();
         //Command cmdClimbUp = new Climb(CLIMB_PWR);
         //Command cmdClimbDown = new Climb(-CLIMB_PWR);
-        Command cmdClimb = new Climb();
+        //Command cmdClimb = new Climb();
         Command cmdAgitatorCW = new SpinAgitator(AGITATOR_PWR);
         Command cmdAgitatorCCW = new SpinAgitator(-AGITATOR_PWR);
         Command cmdSpinShooter = new SpinShooter(-5900.0);
@@ -55,7 +53,7 @@ public class OI {
         new JoystickButton(LEFT_JOY, RobotMap.L_INTAKE_IN.value).whileHeld(cmdIntakeIn);
         //new JoystickButton(LEFT_JOY, RobotMap.L_INTAKE_OUT.value).whileHeld(cmdIntakeOut);
         
-        new JoystickButton(LEFT_JOY, RobotMap.L_CLIMB_UP.value).whileHeld(cmdClimb);
+        //new JoystickButton(LEFT_JOY, RobotMap.L_CLIMB_UP.value).whileHeld(cmdClimb);
         //new JoystickButton(LEFT_JOY, RobotMap.L_CLIMB_DOWN.value).whileHeld(cmdClimbDown);
         
         new JoystickButton(RIGHT_JOY, RobotMap.R_AGITATOR_CW.value).whileHeld(cmdAgitatorCW);
