@@ -3,6 +3,7 @@ package org.usfirst.frc.team4795.robot;
 
 import java.nio.charset.Charset;
 
+import org.usfirst.frc.team4795.robot.subsystems.Agitator;
 import org.usfirst.frc.team4795.robot.subsystems.Climber;
 import org.usfirst.frc.team4795.robot.subsystems.Drivetrain;
 import org.usfirst.frc.team4795.robot.subsystems.Intake;
@@ -14,6 +15,7 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
     
@@ -21,20 +23,35 @@ public class Robot extends IterativeRobot {
     public static Drivetrain drivetrain;
     public static Intake intake;
     public static Shooter shooter;
+    public static Agitator agitator;
     public static Climber climber;
     
     private static ZMQ.Context context;
 	private static ZMQ.Socket subscriber;
 	
 	public static double angle = 0.0;
+	//public static double distance = 0.0;
 	
 	protected void zmqUpdate() {
 	    String angle = subscriber.recvStr(Charset.defaultCharset());
 	    if(angle != null && !angle.equals("")) {
 	        try {
-	            this.angle = Double.parseDouble(angle);
-	        } catch(Exception e) {}
+	            Robot.angle = Double.parseDouble(angle);
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	        }
+	        SmartDashboard.putString("Angle", angle);
 	    }
+	    /*
+	    String distance = subscriber.recvStr(Charset.defaultCharset());
+	    if(distance != null && !distance.equals("")) {
+	        try {
+	            Robot.distance = Double.parseDouble(distance);
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    */
 	}
 	
 	@Override
@@ -43,7 +60,8 @@ public class Robot extends IterativeRobot {
 	    drivetrain.init();
 	    intake = new Intake();
 	    shooter = new Shooter();
-	    climber = new Climber();
+	    agitator = new Agitator();
+	  //  climber = new Climber();
 	    
 	    oi = new OI();
         oi.init();

@@ -40,6 +40,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	private boolean gyroControlMode = false;
 	
 	private boolean brakeMode = false;
+	public boolean reverseControls = false;
 
 	public Drivetrain() {
 //		gyroscope = new ADXRS450_Gyro() {
@@ -229,6 +230,10 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 
 	public double getRightSpeed() {
 		return rightMotor1.getSpeed();
+	}
+	
+	public boolean isGyroOnTarget() {
+	    return gyroControlMode && gyroControl.onTarget();
 	}
 
 //	public void calibrateGyroscope() {

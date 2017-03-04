@@ -7,7 +7,6 @@ import org.usfirst.frc.team4795.robot.RobotMap;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
@@ -23,24 +22,22 @@ public class Shooter extends Subsystem {
      * Distance = 1050
      */
     
-    private static final double P_SPEED = 0.0;
+    private static final double P_SPEED = 15.0;
     private static final double I_SPEED = 0.0;
     private static final double D_SPEED = 0.0;
-    private static final double F_SPEED = 3.343;
+    private static final double F_SPEED = 3.285;
+    private static final double R_SPEED = 6.0;
     
     private static final int ENCODER_TICKS_PER_REV = 3;
     
     private final CANTalon motor;
-    private final Talon agitator;
     
     public Shooter() {
         motor = new CANTalon(RobotMap.SHOOTER_MOTOR.value);
-        agitator = new Talon(RobotMap.AGITATOR_MOTOR.value);
         Robot.initTalon(motor, ENCODER_TICKS_PER_REV);
         //motor.enableBrakeMode(true);
         
         LiveWindow.addActuator("Shooter", "Motor", motor);
-        LiveWindow.addActuator("Shooter", "Agitator", agitator);
     }
     
     public static double rpmToTicksPer10Ms(double rpm) {
@@ -77,8 +74,6 @@ public class Shooter extends Subsystem {
     public void spinBasic(double value) {
         changeControlMode(TalonControlMode.PercentVbus);
         setRaw(value);
-        
-        agitator.set(value == 0.0 ? 0.0 : 1.0);
     }
     
     /**
@@ -88,10 +83,9 @@ public class Shooter extends Subsystem {
     public void spinSpeed(double speed) {
         changeControlMode(TalonControlMode.Speed);
         setPIDF(P_SPEED, I_SPEED, D_SPEED, F_SPEED);
+        motor.setCloseLoopRampRate(R_SPEED);
         // convert to units of encoder ticks per 10ms
         setRaw(/*rpmToTicksPer10Ms(speed)*/speed);
-        
-        agitator.set(speed == 0.0 ? 0.0 : 1.0);
     }
     
     /**

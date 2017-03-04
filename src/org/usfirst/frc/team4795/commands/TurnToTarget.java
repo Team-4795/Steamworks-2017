@@ -9,6 +9,7 @@ public class TurnToTarget extends Command {
 	private final double angle;
 
 	public TurnToTarget(double angle) {
+	    requires(Robot.drivetrain);
 		this.angle = angle;
 	}
 
@@ -25,7 +26,7 @@ public class TurnToTarget extends Command {
 	}
 
 	protected void end() {
-		
+		Robot.drivetrain.driveBasic(0.0, 0.0);
 	}
 
 	protected void interrupted() {

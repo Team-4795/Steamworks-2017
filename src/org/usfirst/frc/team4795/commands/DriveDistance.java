@@ -4,31 +4,28 @@ import org.usfirst.frc.team4795.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-public class ClimbDistance extends Command {
+public class DriveDistance extends Command {
     
     private final double distance;
-    
-    /**
-     * @param distance The distance to climb, in feet.
-     */
-    public ClimbDistance(double distance) {
-        requires(Robot.climber);
+
+    public DriveDistance(double distance) {
         this.distance = distance;
     }
-    
+
     protected void initialize() {
-        Robot.climber.climbFeet(distance);
+        Robot.drivetrain.driveMeters(Robot.drivetrain.getLeftEncoderPos() + distance);
     }
 
-    protected void execute() {}
-    
+    protected void execute() {
+    }
+
     @Override
     protected boolean isFinished() {
         return false;
     }
 
     protected void end() {
-        Robot.climber.climbBasic(0.0);
+        Robot.drivetrain.driveBasic(0.0, 0.0);
     }
 
     protected void interrupted() {

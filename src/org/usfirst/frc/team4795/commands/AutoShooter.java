@@ -1,7 +1,5 @@
 package org.usfirst.frc.team4795.commands;
 
-import java.nio.charset.Charset;
-
 import org.usfirst.frc.team4795.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -9,7 +7,8 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 
 public class AutoShooter extends Command {
     
-    TurnToTarget drivetrainCmd;
+    TurnToTarget turnCmd;
+    DriveDistance driveCmd;
 
     public AutoShooter() {
         requires(Robot.drivetrain);
@@ -17,18 +16,26 @@ public class AutoShooter extends Command {
     }
 
     protected void initialize() {
-        drivetrainCmd = new TurnToTarget(Robot.angle);
-        Scheduler.getInstance().add(drivetrainCmd);
+        turnCmd = new TurnToTarget(Robot.angle);
+        Scheduler.getInstance().add(turnCmd);
     }
 
-    protected void execute() {}
+    protected void execute() {
+        if(Robot.drivetrain.isGyroOnTarget()) {
+            // TODO
+        } else {
+            if(!turnCmd.isRunning()) {
+                Scheduler.getInstance().add(turnCmd);
+            }
+        }
+    }
 
     protected boolean isFinished() {
         return false;
     }
 
     protected void end() {
-       drivetrainCmd.cancel();
+       turnCmd.cancel();
     }
 
     protected void interrupted() {
