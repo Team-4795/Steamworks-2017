@@ -23,8 +23,8 @@ public class TankDrive extends Command {
                 : Robot.oi.getLeftJoyY();
         double right = Robot.drivetrain.reverseControls ? Robot.oi.getLeftJoyY()
                 : Robot.oi.getRightJoyY();
-        throttle *= Robot.drivetrain.reverseControls ? -1.0 : 1.0;
-        Robot.drivetrain.setRaw(Robot.oi.getLeftJoyY() * throttle, Robot.oi.getRightJoyY() * throttle);
+        throttle *= Robot.drivetrain.reverseControls ? 1.0 : -1.0;
+        Robot.drivetrain.setRaw(left * throttle, right * throttle);
         
         SmartDashboard.putNumber("Left Enc", Robot.drivetrain.getLeftEncoderPos());
         SmartDashboard.putNumber("Right Enc", Robot.drivetrain.getRightEncoderPos());

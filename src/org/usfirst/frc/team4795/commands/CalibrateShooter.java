@@ -33,6 +33,9 @@ public class CalibrateShooter extends Command {
         if(!SmartDashboard.containsKey("Ramp Rate")) {
             SmartDashboard.putNumber("Ramp Rate", 12.0);
         }
+        if(!SmartDashboard.containsKey("I Zone")) {
+        	SmartDashboard.putNumber("I Zone", 0.0);
+        }
     }
 
     protected void execute() {
@@ -41,6 +44,9 @@ public class CalibrateShooter extends Command {
         double D = SmartDashboard.getNumber("D", 0.0);
         double F = SmartDashboard.getNumber("F", 0.0);
         Robot.shooter.setPIDF(P, I, D, F);
+        
+        int izone = (int) SmartDashboard.getNumber("I Zone", 0.0);
+        Robot.shooter.setIZone(izone);
         
         double rampRate = SmartDashboard.getNumber("Ramp Rate", 12.0);
         Robot.shooter.setRampRate(rampRate);

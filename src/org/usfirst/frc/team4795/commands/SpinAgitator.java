@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.command.Command;
 public class SpinAgitator extends Command {
 
     private final double speed;
+    private boolean wasIndexerOpen = false;
 
     public SpinAgitator(double speed) {
         requires(Robot.agitator);
@@ -16,6 +17,10 @@ public class SpinAgitator extends Command {
     @Override
     protected void initialize() {
         Robot.agitator.spin(speed);
+        wasIndexerOpen = Robot.shooter.isIndexerOpen();
+        if(speed != 0.0) {
+        	Robot.shooter.openIndexer();
+        }
     }
 
     @Override
@@ -29,6 +34,9 @@ public class SpinAgitator extends Command {
     @Override
     protected void end() {
         Robot.agitator.spin(0.0);
+        if(speed != 0.0 && !wasIndexerOpen) {
+        	Robot.shooter.closeIndexer();
+        }
     }
 
     @Override

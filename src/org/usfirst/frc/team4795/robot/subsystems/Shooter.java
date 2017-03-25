@@ -7,37 +7,60 @@ import org.usfirst.frc.team4795.robot.RobotMap;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class Shooter extends Subsystem {
     
     /*
-     * P = 15
-     * I = 0.000
-     * D = 0.0
-     * F = 3.285
-     * Setpoint = -5900.0
+     * P = 0
+     * I = 0
+     * D = 0
+     * F = 3.375
+     * Setpoint = -7000
      * Ramp Rate = 6.0
-     * Distance = 1050
+     * Distance = 
      */
     
-    private static final double P_SPEED = 15.0;
-    private static final double I_SPEED = 0.0;
+    private static final double P_SPEED = 5.0;
+    private static final double I_SPEED = 0.03;
     private static final double D_SPEED = 0.0;
-    private static final double F_SPEED = 3.285;
-    private static final double R_SPEED = 6.0;
+    private static final double F_SPEED = 3.29;
+    private static final double R_SPEED = 24.0;
+    private static final int I_ZONE_SPEED = 10;
     
     private static final int ENCODER_TICKS_PER_REV = 3;
     
     private final CANTalon motor;
+    
+    private final Servo indexer;
+    private boolean indexerOpen = false;
     
     public Shooter() {
         motor = new CANTalon(RobotMap.SHOOTER_MOTOR.value);
         Robot.initTalon(motor, ENCODER_TICKS_PER_REV);
         //motor.enableBrakeMode(true);
         
+        indexer = new Servo(RobotMap.INDEXER_SERVO.value);
+        closeIndexer();
+        
         LiveWindow.addActuator("Shooter", "Motor", motor);
+        LiveWindow.addActuator("Shooter", "Indexer", indexer);
+    }
+    
+    public void openIndexer() {
+    	indexer.setAngle(125);
+    	indexerOpen = true;
+    }
+    
+    public void closeIndexer() {
+    	indexer.setAngle(180);
+    	indexerOpen = false;
+    }
+    
+    public boolean isIndexerOpen() {
+    	return indexerOpen;
     }
     
     public static double rpmToTicksPer10Ms(double rpm) {
@@ -67,6 +90,10 @@ public class Shooter extends Subsystem {
         motor.setF(F);
     }
     
+    public void setIZone(int izone) {
+    	motor.setIZone(izone);
+    }
+    
     /**
      * Set the intake motor output to the given value.
      * @param value The output value to set from -1.0 to 1.0
@@ -85,6 +112,7 @@ public class Shooter extends Subsystem {
         setPIDF(P_SPEED, I_SPEED, D_SPEED, F_SPEED);
         motor.setCloseLoopRampRate(R_SPEED);
         // convert to units of encoder ticks per 10ms
+        setIZone(I_ZONE_SPEED);
         setRaw(/*rpmToTicksPer10Ms(speed)*/speed);
     }
     

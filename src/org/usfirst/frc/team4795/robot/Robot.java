@@ -3,7 +3,7 @@ package org.usfirst.frc.team4795.robot;
 
 import java.nio.charset.Charset;
 
-import org.usfirst.frc.team4795.commands.CalibrateDrivetrain;
+import org.usfirst.frc.team4795.commands.DriveTime;
 import org.usfirst.frc.team4795.robot.subsystems.Agitator;
 import org.usfirst.frc.team4795.robot.subsystems.Climber;
 import org.usfirst.frc.team4795.robot.subsystems.Drivetrain;
@@ -28,14 +28,18 @@ public class Robot extends IterativeRobot {
     public static Climber climber;
     
     private static ZMQ.Context context;
-	private static ZMQ.Socket subscriber;
+    private static ZMQ.Socket subscriber;
 	
 	public static double angle = 0.0;
 	//public static double distance = 0.0;
 	
 	protected void zmqUpdate() {
 	    String angle = subscriber.recvStr(Charset.defaultCharset());
-	    if(angle != null && !angle.equals("")) {
+	    if(angle == null) {
+	    	SmartDashboard.putString("Angle", "NULL ANGLE");
+	    } else if(angle.equals("")) {
+	    	SmartDashboard.putString("Angle", "NO ANGLE");
+	    } else {
 	        try {
 	            Robot.angle = Double.parseDouble(angle);
 	        } catch(Exception e) {
@@ -62,10 +66,12 @@ public class Robot extends IterativeRobot {
 	    intake = new Intake();
 	    shooter = new Shooter();
 	    agitator = new Agitator();
-	  //  climber = new Climber();
+	    climber = new Climber();
 	    
 	    oi = new OI();
         oi.init();
+        
+//      CameraServer.getInstance().startAutomaticCapture();
 	    
 	    context = ZMQ.context(1);
 	    subscriber = context.socket(ZMQ.SUB);
@@ -76,7 +82,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
     public void teleopInit() {
-	    Scheduler.getInstance().add(new CalibrateDrivetrain());
+	    //Scheduler.getInstance().add(new CalibrateShooter());
 	}
 	
 	@Override
@@ -87,7 +93,9 @@ public class Robot extends IterativeRobot {
     }
     
 	@Override
-    public void autonomousInit() {}
+    public void autonomousInit() {
+		Scheduler.getInstance().add(new DriveTime(3000));
+	}
     
 	@Override
     public void autonomousPeriodic() {

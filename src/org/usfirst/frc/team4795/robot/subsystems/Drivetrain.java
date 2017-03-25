@@ -15,9 +15,10 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class Drivetrain extends Subsystem implements PIDOutput {
     
-    public static final double P_POS = 0.0;
-    public static final double I_POS = 0.0;
-    public static final double D_POS = 0.0;
+    public static final double P_POS = 0.8;
+    public static final double I_POS = 0.001;
+    public static final double D_POS = 1000.0;
+    public static final int I_ZONE_POS = 2000;
     
     public static final double P_GYRO_POS = -0.047;
     public static final double I_GYRO_POS = 0.0;
@@ -40,7 +41,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	private boolean gyroControlMode = false;
 	
 	private boolean brakeMode = false;
-	public boolean reverseControls = false;
+	public boolean reverseControls = true;
 
 	public Drivetrain() {
 //		gyroscope = new ADXRS450_Gyro() {
@@ -59,9 +60,9 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		Robot.initTalon(leftMotor1, ENCODER_TICKS_PER_REV);
 		Robot.initTalon(leftMotor2, ENCODER_TICKS_PER_REV);
 		leftMotor1.reverseSensor(false);
-		leftMotor2.reverseSensor(true);
 		Robot.initTalon(rightMotor1, ENCODER_TICKS_PER_REV);
 		Robot.initTalon(rightMotor2, ENCODER_TICKS_PER_REV);
+		rightMotor1.reverseSensor(true);
 		
 		LiveWindow.addSensor("Drivetrain", "Left Motor 1", leftMotor1);
 		LiveWindow.addSensor("Drivetrain", "Left Motor 2", leftMotor2);
@@ -143,6 +144,11 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 		rightMotor1.setPID(P, I, D);
 		rightMotor1.setF(F);
 	}
+	
+	public void setIZone(int izone) {
+		leftMotor1.setIZone(izone);
+		rightMotor1.setIZone(izone);
+	}
 
 	public void driveBasic(double left, double right) {
 		changeControlMode(TalonControlMode.PercentVbus);
@@ -152,6 +158,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	public void driveFeet(double distance) {
 		changeControlMode(TalonControlMode.Position);
 		setPIDF(P_POS, I_POS, D_POS, 0.0);
+		setIZone(I_ZONE_POS);
 		double distanceTicks = distance * ENCODER_TICKS_PER_FT;
 		setRaw(leftMotor1.getPosition() + distanceTicks,
 				rightMotor1.getPosition() + distanceTicks);
@@ -213,7 +220,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	}
 
 	public double getRightEncoderPos() {
-		return rightMotor1.getPosition();
+		return rightMotor1.getEncPosition();
 	}
 
 	public double getLeftEncoderVel() {

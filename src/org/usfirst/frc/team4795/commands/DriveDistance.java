@@ -1,8 +1,6 @@
 package org.usfirst.frc.team4795.commands;
 
 import org.usfirst.frc.team4795.robot.Robot;
-import org.usfirst.frc.team4795.robot.subsystems.Drivetrain;
-
 import edu.wpi.first.wpilibj.command.Command;
 
 public class DriveDistance extends Command {

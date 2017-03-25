@@ -30,9 +30,16 @@ public class CalibrateDrivetrain extends Command {
         if(!SmartDashboard.containsKey("Ramp Rate")) {
             SmartDashboard.putNumber("Ramp Rate", 12.0);
         }
+        
+        if(!SmartDashboard.containsKey("I Zone")) {
+        	SmartDashboard.putNumber("I Zone", 0.0);
+        }
     }
 
     protected void execute() {
+    	int izone = (int) SmartDashboard.getNumber("I Zone", 0);
+    	Robot.drivetrain.setIZone(izone);
+    	
         double P = SmartDashboard.getNumber("P", 0.0);
         double I = SmartDashboard.getNumber("I", 0.0);
         double D = SmartDashboard.getNumber("D", 0.0);
